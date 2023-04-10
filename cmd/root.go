@@ -5,9 +5,11 @@ package cmd
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 
+	"github.com/sashabaranov/go-openai"
 	"github.com/spf13/cobra"
 )
 
@@ -28,15 +30,41 @@ to quickly create a Cobra application.`,
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
+// 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
 func Execute() {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Ask to chat gpt: ")
-	text, err := reader.ReadString('\n')
-	if err != nil {
-		panic(err)
-	}
+	for {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Ask to chat gpt: ")
+		text, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Error reading input:", err)
+			return
+		}
 
-	fmt.Println("User input:", text)
+		fmt.Println("Input text:", text)
+
+		c := openai.NewClient(os.Getenv("GPT_KEY"))
+
+		resp, err := c.CreateChatCompletion(
+			context.Background(),
+			openai.ChatCompletionRequest{
+				Model: openai.GPT3Dot5Turbo,
+				Messages: []openai.ChatCompletionMessage{
+					{
+						Role:    "user",
+						Content: text,
+					},
+				},
+			},
+		)
+
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(resp.Choices[0].Message.Content)
+		fmt.Println()
+	}
 }
 
 func init() {

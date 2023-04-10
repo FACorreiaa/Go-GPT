@@ -30,7 +30,6 @@ to quickly create a Cobra application.`,
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-// 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
 func Execute() {
 	for {
 		reader := bufio.NewReader(os.Stdin)
